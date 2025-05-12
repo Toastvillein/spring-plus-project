@@ -19,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+// 필수레벨 1 readOnly = true가 문제라서 삭제
+@Transactional
 public class TodoService {
 
     private final TodoRepository todoRepository;
