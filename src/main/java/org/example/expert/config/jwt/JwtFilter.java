@@ -1,4 +1,4 @@
-package org.example.expert.config;
+package org.example.expert.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,11 +11,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.expert.domain.user.enums.UserRole;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
@@ -49,17 +55,27 @@ public class JwtFilter implements Filter {
 
         try {
             // JWT 유효성 검사와 claims 추출
-            Claims claims = jwtUtil.extractClaims(jwt);
-            if (claims == null) {
+            /* 필수레벨 9 기존에 쓰는 setAttribute는 삭제
+             *  UserAuth를 새로 만들어 적용 */
+            UserAuth userAuth = jwtUtil.extractClaims(jwt);
+            if (userAuth == null) {
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
                 return;
             }
 
-            UserRole userRole = UserRole.valueOf(claims.get("userRole", String.class));
+            UserRole userRole = userAuth.getUserRole();
 
-            httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
-            httpRequest.setAttribute("email", claims.get("email"));
-            httpRequest.setAttribute("userRole", claims.get("userRole"));
+            // httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
+            // httpRequest.setAttribute("email", claims.get("email"));
+            // httpRequest.setAttribute("userRole", claims.get("userRole"));
+
+            // UserRole을 적용시키기 위한 SimpleGrantedAuthority 정의
+            List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_"+userAuth.getUserRole().name())
+            );
+
+            UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(userAuth,null,authorities);
 
             if (url.startsWith("/admin")) {
                 // 관리자 권한이 없는 경우 403을 반환합니다.
@@ -70,6 +86,9 @@ public class JwtFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             }
+
+            // Spring SecurityContext에 저장
+            SecurityContextHolder.getContext().setAuthentication(authToken);
 
             chain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {

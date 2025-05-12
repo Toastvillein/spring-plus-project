@@ -1,4 +1,4 @@
-package org.example.expert.config;
+package org.example.expert.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -56,11 +56,17 @@ public class JwtUtil {
         throw new ServerException("Not Found Token");
     }
 
-    public Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
+    // SpringSecurity를 활용하기 위해 새로 만든 UserAuth 클래스를 반환 하도록 변경
+    public UserAuth extractClaims(String token) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        return new UserAuth(Long.parseLong(claims.getSubject()),
+            claims.get("email",String.class),
+            UserRole.valueOf(claims.get("userRole",String.class)),
+                claims.get("nickname",String.class));
     }
 }
