@@ -30,7 +30,8 @@ public class Todo extends Timestamped {
     @OneToMany(mappedBy = "todo", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "todo")
+    // 필수레벨 6 cascade 추가 및 매니저 등록 시 삭제도 분명 필요하다 판단되어 고아객체 삭제까지 지정함
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Manager> managers = new ArrayList<>();
 
     public Todo(String title, String contents, String weather, User user) {
