@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.todo.dto.request.SearchTodoRequest;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
+import org.example.expert.domain.todo.dto.response.SearchTodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
 import org.example.expert.domain.todo.entity.Todo;
@@ -81,5 +83,14 @@ public class TodoService {
                 todo.getCreatedAt(),
                 todo.getModifiedAt()
         );
+    }
+
+    // 레벨 10 검색기능 Service 메서드
+    public Page<SearchTodoResponse> searchTodo(SearchTodoRequest request) {
+        // page의 default값이 1이고 페이징시 첫번째 인덱스는 0부터 시작하기 때문에 -1로 간극을 맞춰줌
+        Pageable pageable = PageRequest.of(request.getPage()-1, request.getSize());
+
+        return todoRepository.findAllByTitleOrDateOrNickname(
+            request.getTitle(),request.getNickname(),request.getStartDate(),request.getEndDate(),pageable);
     }
 }
