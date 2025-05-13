@@ -1,6 +1,8 @@
 package org.example.expert.domain.manager.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.example.expert.config.jwt.UserAuth;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
@@ -14,6 +16,7 @@ import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
@@ -29,10 +32,14 @@ public class ManagerService {
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
 
-    @Transactional
-    public ManagerSaveResponse saveManager(AuthUser authUser, long todoId, ManagerSaveRequest managerSaveRequest) {
+    /* 레벨 11 AOP가 이미 트랜잭션 안에 들어와 있을 수 있기 때문에
+    *  saveManager가 롤백되면 로그도 롤백될 수도 있다
+    *  그래서 트랜잭션을 분리시킴
+    * */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public ManagerSaveResponse saveManager(UserAuth authUser, long todoId, ManagerSaveRequest managerSaveRequest) {
         // 일정을 만든 유저
-        User user = User.fromAuthUser(authUser);
+        User user = User.fromUserAuth(authUser);
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
