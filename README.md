@@ -10,18 +10,25 @@
 
 위와 같이 실제 있는 데이터로 진행
 
+
 ![5](https://github.com/user-attachments/assets/3e62979f-6594-40d4-b37d-b49149f7b7c2)
+
 유저를 닉네임 기준으로 목록검색을 하는 API에서 Page vs Slice 중 뭐를 사용하는게 더 빠를까에 포커스를 맞춤
 
 애초에 Slice가 더 빠르다는 사실은 알고 있었으나 직접, 얼마나 차이나는지 확인 해보고 싶었음
 
+
 ### Page 시간측정 
 ![4](https://github.com/user-attachments/assets/7e372970-94d8-442c-9b7f-37c0960c36df)
+
 테스트 코드 시작부터 성공까지 = 293ms
+
 
 ### Slice 시간측정
 ![3](https://github.com/user-attachments/assets/90b8ad2a-14ac-45a5-8a0f-c75f2cd99180)
+
 테스트 코드 시작부터 성공까지 = 232ms
+
 
 | API 반환타입 | Page  | Slice |
 |----------|-------|-------|
