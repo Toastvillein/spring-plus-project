@@ -3,9 +3,11 @@
 
 ### DB에 100만개의 대용량 데이터 삽입
 ![1](https://github.com/user-attachments/assets/743bb86b-3a7c-4a02-a75b-ce9e75b2e1e1)
+
 실제로 JVM heap memory가 못버텨서 (기존 700mb를 3500mb로 늘림) 100만개까진 들어가지 않았고 위와 같이 34만개만 집어넣고 진행
 
 ![2](https://github.com/user-attachments/assets/b0647ec9-f6dc-44ed-86b3-eff8bfc4cff4)
+
 위와 같이 실제 있는 데이터로 진행
 
 ![5](https://github.com/user-attachments/assets/3e62979f-6594-40d4-b37d-b49149f7b7c2)
