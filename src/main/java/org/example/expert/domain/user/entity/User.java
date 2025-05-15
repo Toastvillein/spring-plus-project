@@ -32,6 +32,11 @@ public class User extends Timestamped {
         this.nickname = nickname;
     }
 
+    public User(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+    }
+
     public User(String email, String password, UserRole userRole) {
         this.email = email;
         this.password = password;
